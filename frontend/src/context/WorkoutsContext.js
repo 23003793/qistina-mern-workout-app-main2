@@ -1,7 +1,14 @@
-import { createContext, useReducer } from "react";
+import { createContext, useReducer, useCallback } from "react";
 
 // Create the WorkoutsContext
 export const WorkoutsContext = createContext();
+
+// Initial state structure
+const initialState = {
+    workouts: [],  // Default empty array for workouts
+    loading: false, // Loading state (optional)
+    error: null,    // Error state (optional)
+};
 
 // WorkoutsReducer to handle the actions
 export const workoutsReducer = (state, action) => {
@@ -18,9 +25,8 @@ export const workoutsReducer = (state, action) => {
             }
 
         case 'DELETE_WORKOUT':
-            // Ensure action.payload._id exists
             return {
-                workouts: state.workouts.filter((w) => w._id !== action.payload._id),
+                workouts: state.workouts.filter((w) => w._id !== action.payload._id), // Deletes workout by _id
             }
 
         case 'UPDATE_WORKOUT':
@@ -31,6 +37,18 @@ export const workoutsReducer = (state, action) => {
                 ),
             }
 
+        case 'SET_LOADING':
+            return {
+                ...state,
+                loading: true, // Set loading state
+            }
+
+        case 'SET_ERROR':
+            return {
+                ...state,
+                error: action.payload, // Set error state
+            }
+
         default:
             return state;
     }
@@ -38,12 +56,12 @@ export const workoutsReducer = (state, action) => {
 
 // WorkoutsContextProvider to wrap around components
 export const WorkoutsContextProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(workoutsReducer, {
-        workouts: [], // Default to empty array
-    })
+    const [state, dispatch] = useReducer(workoutsReducer, initialState);
+
+    const memoizedDispatch = useCallback(dispatch, []); // Memoize dispatch
 
     return (
-        <WorkoutsContext.Provider value={{ ...state, dispatch }}>
+        <WorkoutsContext.Provider value={{ ...state, dispatch: memoizedDispatch }}>
             {children}
         </WorkoutsContext.Provider>
     )
