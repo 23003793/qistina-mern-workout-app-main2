@@ -2,53 +2,42 @@
 // where we register the express app
 
 import cors from "cors"; // Use import instead of require
-
-// dotenv is the package that loads environment variables
-// from .env file into process.env object available globally in node.js environment
-// config() attaches environment variables to process.env
 import dotenv from "dotenv";
-dotenv.config();
-
-// Import express, mongoose, and routes using import
 import express from "express";
 import mongoose from "mongoose";
 import workoutRoutes from "./routes/workouts.js"; // Include .js extension for modules
 import userRoutes from "./routes/user.js"; // Include .js extension for modules
 
+// dotenv config to load environment variables
+dotenv.config();
+
 // Set up the express app
 const app = express();
 
-// Middleware:
-// any code that executes between us getting a request on the server
-// and us sending a response back to the client
-
-// Enable CORS
+// Middleware
 app.use(cors());
-
-// Parse and attach data sent to server to request object
 app.use(express.json());
 
-// Global middleware
-// the arrow function will fire for each request that comes in
+// Global middleware to log requests
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();
 });
 
 // Routes
-// workoutRoutes is triggered when we make a request to /api/workouts
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/user", userRoutes);
 
-// Connect to DB
+// Connect to DB and then start the server
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    // Listen for requests
+    // Start server only if DB connection is successful
     app.listen(process.env.PORT, () => {
-      console.log("Connected to DB & listening on port", process.env.PORT);
+      console.log(`Connected to DB & listening on port ${process.env.PORT}`);
     });
   })
   .catch((err) => {
-    console.log(err);
+    console.log("Database connection failed:", err);
+    process.exit(1); // Exit process if DB connection fails
   });
