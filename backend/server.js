@@ -1,20 +1,19 @@
 // Entry file for the backend app
 // where we register the express app
 
-const cors = require("cors");
+import cors from "cors"; // Use import instead of require
 
-// dovenv is the package that loads environment variables
+// dotenv is the package that loads environment variables
 // from .env file into process.env object available globally in node.js environment
 // config() attaches environment variables to process.env
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
-// Require express that installed via npm
-const express = require("express");
-// Require mongoose that installed via npm
-const mongoose = require("mongoose");
-// Require routes
-const workoutRoutes = require("./routes/workouts");
-const userRoutes = require("./routes/user");
+// Import express, mongoose, and routes using import
+import express from "express";
+import mongoose from "mongoose";
+import workoutRoutes from "./routes/workouts.js"; // Include .js extension for modules
+import userRoutes from "./routes/user.js"; // Include .js extension for modules
 
 // Set up the express app
 const app = express();
